@@ -1,0 +1,2 @@
+com.github.konfko.jackson.JsonSettingsParserFactory
+com.github.konfko.jackson.YamlSettingsParserFactory

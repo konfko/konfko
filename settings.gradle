@@ -1,0 +1,6 @@
+rootProject.name = 'konfko'
+include ':konfko-core'
+include ':konfko-jackson'
+
+project(':konfko-core').projectDir = "$rootDir/konfko-core" as File
+project(':konfko-jackson').projectDir = "$rootDir/konfko-jackson" as File

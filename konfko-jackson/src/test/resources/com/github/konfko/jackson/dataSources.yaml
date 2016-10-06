@@ -1,0 +1,11 @@
+dataSource:
+    first:
+        url: jdbc:test:localhost/first
+        username: firstUser
+        password: firstPassword
+
+dataSource.second.url: jdbc:test:localhost/second
+dataSource.second:
+  username: secondUser
+  password: secondPassword
+dataSource.second.connectionTimeout: 20
