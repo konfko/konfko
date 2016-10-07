@@ -54,11 +54,11 @@ class ResourceSettingsSource(override val backingResource: SettingsResource, pri
  *
  * Supports updates by setting the [settings] property to a new map
  */
-class MapSettingsSource(override val name: String, settings: Map<String, Any>) : SettingsSource {
+class StructuredSettingsSource(override val name: String, settings: Any) : SettingsSource {
     override var lastModified: Instant = Instant.now()
         private set
 
-    var settings: Map<String, Any> by observable(settings) { property, old, new -> lastModified = Instant.now() }
+    var settings: Any by observable(settings) { property, old, new -> lastModified = Instant.now() }
 
     override val backingResource: SettingsResource? = null
 
@@ -66,7 +66,7 @@ class MapSettingsSource(override val name: String, settings: Map<String, Any>) :
 }
 
 private object SystemPropertiesSource : SettingsSource {
-    override val name = "<system properties>"
+    override val name = "<system settings>"
     override val lastModified: Instant? = null
     override val backingResource: SettingsResource? = null
 
@@ -77,7 +77,7 @@ private object SystemPropertiesSource : SettingsSource {
 }
 
 private object EnvironmentPropertiesSource : SettingsSource {
-    override val name = "<environment properties>"
+    override val name = "<environment settings>"
     override val lastModified: Instant? = null
     override val backingResource: SettingsResource? = null
 
@@ -91,11 +91,11 @@ private object EnvironmentPropertiesSource : SettingsSource {
 
 
 /**
- * Returns all system properties
+ * Returns all system settings
  */
 fun systemPropertiesSource(): SettingsSource = SystemPropertiesSource
 
 /**
- * Returns all environment properties, changing key format from SNAKE_CASE to period.case
+ * Returns all environment settings, changing key format from SNAKE_CASE to period.case
  */
 fun environmentPropertiesSource(): SettingsSource = EnvironmentPropertiesSource

@@ -89,7 +89,7 @@ open class DelegatingSettingsParser : SettingsParser {
 /**
  * Default settings parser, used when no custom parser is provided to SettingsMaker.
  *
- * This parser automatically registered properties extension and any parser discovered by
+ * This parser automatically registered settings extension and any parser discovered by
  * [findAndRegisterExtensionParsers]
  */
 object DefaultSettingsParser : DelegatingSettingsParser() {

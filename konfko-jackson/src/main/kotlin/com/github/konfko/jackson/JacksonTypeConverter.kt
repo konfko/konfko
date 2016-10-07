@@ -16,8 +16,8 @@ import com.github.konfko.core.TypeConverterFactory
  * Note that once this converter is selected, any conversion of sub values will be done using by jackson only.
  *
  * For example:
- * converting to data class Alarm(val message: String, val time: ZonedDateTime), message and time
- * properties will be converted using jackson ObjectMapper. There is no fallback back to the SettingsMapper's type converter
+ * converting to settings class Alarm(val message: String, val time: ZonedDateTime), message and time
+ * settings will be converted using jackson ObjectMapper. There is no fallback back to the SettingsMapper's type converter
  *
  */
 open class JacksonTypeConverter(val mapper: ObjectMapper) : SettingsTypeConverter {

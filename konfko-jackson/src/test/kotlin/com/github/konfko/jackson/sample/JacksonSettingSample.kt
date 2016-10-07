@@ -3,10 +3,11 @@ package com.github.konfko.jackson.sample
 import com.github.konfko.core.Setting
 import com.github.konfko.core.Settings
 import com.github.konfko.core.at
-import com.github.konfko.jackson.withTempDir
-import com.github.konfko.jackson.write
+import com.github.konfko.core.derived.prefixBy
 import com.github.konfko.core.source.SettingsMaker
 import com.github.konfko.core.watcher.NioConfigurationChangeWatcher
+import com.github.konfko.jackson.withTempDir
+import com.github.konfko.jackson.write
 import java.net.URI
 import java.time.Duration
 import java.time.LocalTime
@@ -31,7 +32,7 @@ fun main(args: Array<String>) {
         // No need to specify it here, either for file parsing or for type conversion
         val reloadableSettings = SettingsMaker().makeAndWatch(watcher) {
             path(conf)
-            systemProperties() under "system" // prefix all system properties with "system"
+            systemProperties() transform { it.prefixBy("system") } // prefix all system settings with "system"
         }
         // once obtained, settings will never change. For an updated version, you must call ReloadableSettings.current again
         val settings = reloadableSettings.current
@@ -65,7 +66,7 @@ fun main(args: Array<String>) {
 
 private fun createConfigurableService(settings: Settings): ConfigurableService {
     val service = ConfigurableService(
-            // Use jackson parser to convert to data classes
+            // Use jackson parser to convert to settings classes
             settings.at("httpClient")
     )
     return service
@@ -84,8 +85,8 @@ private fun ScheduledExecutorService.scheduleServiceConfigurationPrinter(service
 }
 
 
-// A demo class that shows how to configure services with data class configuration
-// If you use jackson module, it is preferable to have a single Setting with custom conf data object
+// A demo class that shows how to configure services with settings class configuration
+// If you use jackson module, it is preferable to have a single Setting with custom conf settings object
 class ConfigurableService(configuration: Setting<Configuration>) {
     val conf by configuration.onUpdate { new -> reload(new) }
 

@@ -5,6 +5,7 @@
 package com.github.konfko.core.sample
 
 import com.github.konfko.core.*
+import com.github.konfko.core.derived.prefixBy
 import com.github.konfko.core.derived.subSettings
 import com.github.konfko.core.source.SettingsMaker
 import com.github.konfko.core.watcher.NioConfigurationChangeWatcher
@@ -23,20 +24,20 @@ fun main(args: Array<String>) {
     val scheduler = Executors.newScheduledThreadPool(1) // just to periodically print current configuration
 
     withTempDir { dir ->
-        val conf = dir.resolve("sample.properties")
+        val conf = dir.resolve("sample.settings")
         conf.write(confProperties)
 
         val watcher = NioConfigurationChangeWatcher()
 
         val reloadableSettings = SettingsMaker().makeAndWatch(watcher) {
             path(conf)
-            systemProperties() under "system" // prefix all system properties with "system"
+            systemProperties() transform { it.prefixBy("system") } // prefix all system settings with "system"
         }
         // once obtained, settings will never change. For a new version, you must call ReloadableSettings.current again
         val settings = reloadableSettings.current
 
 
-        // listens to changes to java version (if removed from samples.properties it will revert to system properties)
+        // listens to changes to java version (if removed from samples.settings it will revert to system settings)
         val javaVersion = settings.at<String>("system.java.version").onUpdate { log("Java version changed to $it") }
 
         // directly retrieve values from settings
@@ -100,14 +101,14 @@ private fun ScheduledExecutorService.scheduleServiceConfigurationPrinter(service
 }
 
 // A demo class that shows how to configure services with reloadable configuration.
-// If you use jackson module, it is preferable to have a single Setting with custom conf data object.
+// If you use jackson module, it is preferable to have a single Setting with custom conf settings object.
 // Look at JacksonSettingsSample in jackson module for an example
 class ConfigurableService(url: Setting<URI>,
                           connectionTimeout: Setting<Duration>,
                           keyStore: Setting<String>) {
     // by delegation (property type annotations are optional, here they are just for clarity)
     val url: URI by url
-    // nullable properties must use delegate to Setting.optional
+    // nullable settings must use delegate to Setting.optional
     val connectionTimeout: Duration? by connectionTimeout.optional
 
     /* If a change fo settings requires some action by the service, you can register a listener on the setting

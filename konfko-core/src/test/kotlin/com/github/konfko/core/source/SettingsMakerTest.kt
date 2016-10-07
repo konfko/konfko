@@ -21,7 +21,7 @@ class SettingsMakerTest {
     fun loadOverride() {
         val settings = SettingsMaker().make {
             classpath("com/github/konfko/core/dataSources.properties")
-            map("defaults", mapOf("dataSource.first.connectionTimeout" to 120))
+            provided("defaults", mapOf("dataSource.first.connectionTimeout" to 120))
         }
 
         assertThat(settings.get<String>("dataSource.first.username")).isEqualTo("firstUser")

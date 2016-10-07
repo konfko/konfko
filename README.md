@@ -14,7 +14,9 @@ Reloadable configuration in kotlin
 * Supports a nested structure of settings
     * which can be defined either as nested objects or flat, separated by a period. 
     * Mix and match is possible, even in the same file
-    * self similar: each subtree in the Settings can itself be treated as Settings
+* Settings can be transformed
+    * Settings can be filtered by keys, limited to a subtree, or prefixed
+    * self similar: transformations of Settings can itself be treated as Settings
 * Supports reloading of configuration changes
     * Two methods: periodic watching of lastModified timestamps, or with java 7 WatchService
     * Even when reloading is enabled, Settings instances are immutable
@@ -63,14 +65,14 @@ More complex creation:
 val settings = SettingsMaker().make {
     // highest priority sources are defined first
     path(Paths.get("config.properties"))
-    // Loading will not fail if an optional source fails to load (A warning is written to log instead)
+    // Loading will not fail if an optional source fails to load (A warning is written to log, but a custom handler is possible)
     path("plugins.properties") optional true
     systemProperties()
-    // all settings from a single source can be put under a prefix
-    environment() under "env"
+    // settings from a single source can be transformed before they are merged with others
+    environment() transform { it.prefixBy("env") }
     classpath("default-config.properties")
     // you can also provide values programatically
-    map(name = "hardcoded", properties = mapOf("env.user.home" to ".")) under "env"
+    provided(name = "provided", settings = mapOf("env.user.home" to "."))
 }
 ```
 

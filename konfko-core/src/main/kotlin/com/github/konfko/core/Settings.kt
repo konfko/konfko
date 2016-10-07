@@ -8,7 +8,7 @@ import java.util.*
 
 /**
  * A collection of settings.
- * It provides a nested view of setting properties. In keys, levels are specified with '.'
+ * It provides a nested view of setting settings. In keys, levels are specified with '.'
  *
  * Implementations of this interface are always immutable, event for reloadable settings.
  * You can however get a potentially reloadable view of a particular setting with [atTyped], or more

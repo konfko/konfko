@@ -50,12 +50,12 @@ class ReloadableSettings internal constructor(
 
         val updatedProperties = findUpdatedSettingKeys(old, new)
         if (updatedProperties.isEmpty()) {
-            LOG.info("Triggered configuration reload, but no properties were updated. No listeners will be notified")
+            LOG.info("Triggered configuration reload, but no settings were updated. No listeners will be notified")
             return
         }
         current = new
 
-        LOG.info("Detected changes to configuration properties: $updatedProperties. Notifying listeners.")
+        LOG.info("Detected changes to configuration settings: $updatedProperties. Notifying listeners.")
         notifyListeners(new, updatedProperties)
     }
 

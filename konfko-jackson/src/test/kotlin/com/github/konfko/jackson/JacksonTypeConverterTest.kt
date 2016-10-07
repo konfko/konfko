@@ -1,6 +1,6 @@
 package com.github.konfko.jackson
 
-import com.github.konfko.core.source.MapSettingsSource
+import com.github.konfko.core.source.StructuredSettingsSource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
@@ -69,7 +69,7 @@ class JacksonTypeConverterTest {
                 "dataSource.second.password" to "secondPassword",
                 "dataSource.second.connectionTimeout" to "20"
         )
-        val nestedData = MapSettingsSource("test", data).load().toNestedMap()
+        val nestedData = StructuredSettingsSource("test", data).load().toNestedMap()
 
         val conf = DefaultJacksonTypeConverter.convertTo(nestedData, DataSourcesConf::class.java)
 

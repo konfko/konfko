@@ -16,7 +16,7 @@ import com.github.konfko.core.*
  * For example, mapOf("dataSource.first.username" to "name") is converted to
  * mapOf("dataSource" to mapOf("first" to mapOf("username" to "name)))
  *
- * If the provided data is neither a Map or a List, it is interpreted as mapOf("" to data).
+ * If the provided settings is neither a Map or a List, it is interpreted as mapOf("" to settings).
  */
 class StructuredSettings(data: Any,
                          private val typeConverter: SettingsTypeConverter = DefaultSettingsTypeConverter) :
