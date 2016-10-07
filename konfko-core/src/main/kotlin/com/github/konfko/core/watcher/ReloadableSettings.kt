@@ -1,6 +1,7 @@
 package com.github.konfko.core.watcher
 
 import com.github.konfko.core.*
+import com.github.konfko.core.derived.subSettings
 import com.github.konfko.core.source.SettingsSource
 import org.slf4j.LoggerFactory
 import java.io.Closeable

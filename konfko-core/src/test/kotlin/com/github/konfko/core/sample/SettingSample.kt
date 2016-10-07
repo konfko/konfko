@@ -5,6 +5,7 @@
 package com.github.konfko.core.sample
 
 import com.github.konfko.core.*
+import com.github.konfko.core.derived.subSettings
 import com.github.konfko.core.source.SettingsMaker
 import com.github.konfko.core.watcher.NioConfigurationChangeWatcher
 import java.net.URI

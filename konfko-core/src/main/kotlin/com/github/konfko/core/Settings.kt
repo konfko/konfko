@@ -118,34 +118,7 @@ abstract class AbstractSettings : Settings {
     }
 }
 
-/**
- * An abstract class for settings that have been derived from other settings.
- */
-abstract class DerivedSettings : AbstractSettings() {
-    /**
-     * Root settings in the derived chain
-     */
-    val root: Settings get() = parentChain.first()
 
-    /**
-     * Chain of all parents. First element is the root, last element is the immediate parent of this settings
-     */
-    protected val parentChain: List<Settings> by lazy {
-        var p: Settings = parent
-        val parents = LinkedList<Settings>()
-        parents.addFirst(p)
-        while (p is DerivedSettings) {
-            p = p.parent
-            parents.addFirst(p)
-        }
-        parents.toList()
-    }
-
-    /**
-     * Settings from which this settings was derived from
-     */
-    abstract val parent: Settings
-}
 
 private object EmptySettings : AbstractSettings() {
     override val empty = true

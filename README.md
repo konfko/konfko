@@ -10,9 +10,9 @@ Reloadable configuration in kotlin
 * Wherever possible, tries to preserve original order of settings. 
 * Can load from several sources. where additional sources only provides settings missing in the previous sources
     * can be used to define default or override sources
-    * later settings come after already defined settings
+    * a source can be defined optional, or be transformed immediately after load (before merging with other sources) 
 * Supports a nested structure of settings
-    * which can be defined either as nested objects or flat, separated by period. 
+    * which can be defined either as nested objects or flat, separated by a period. 
     * Mix and match is possible, even in the same file
     * self similar: each subtree in the Settings can itself be treated as Settings
 * Supports reloading of configuration changes
@@ -58,7 +58,7 @@ val port: Int = settings["server.port"]
 val connectionTimeout: Duration = settings.getIfPresent("server.connectionTimeout") ?: Duration.ofSeconds(30)
 ```
 
-Slightly more advanced creation:
+More complex creation:
 ```kotlin
 val settings = SettingsMaker().make {
     // highest priority sources are defined first
@@ -74,7 +74,7 @@ val settings = SettingsMaker().make {
 }
 ```
 
-Konfko doesn't provide any custom parsers; by default, only .properties files are supported. However, it is simple to extend it with additional formats. 
+konfko-core doesn't provide any custom parsers; by default, only .properties files are supported. However, it is simple to extend it with additional formats. 
 
 For example, you can just include konfko-jackson module (for brevity, only Gradle is shown):
 ```gradle

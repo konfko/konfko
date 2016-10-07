@@ -1,5 +1,10 @@
-package com.github.konfko.core
+package com.github.konfko.core.derived
 
+import com.github.konfko.core.NoSuchSettingException
+import com.github.konfko.core.derived.SubSettings
+import com.github.konfko.core.derived.subSettings
+import com.github.konfko.core.get
+import com.github.konfko.core.getIfPresent
 import com.github.konfko.core.structured.StructuredSettings
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -48,8 +53,8 @@ class SubSettingsTest {
 
     @Test
     fun presentSingleValueSubSetting() {
-        val sub = settings.subSettings("dataSource.second.connectionTimeout")
-        assertThat(sub.absolutePrefix).isEqualTo("dataSource.second.connectionTimeout")
+        val sub = settings.subSettings("dataSource.second.connectionTimeout") as SubSettings
+        assertThat(sub.makeAbsoluteKey("")).isEqualTo("dataSource.second.connectionTimeout")
         assertThat(sub.get<Int>("")).isEqualTo(20)
 
         assertThat(sub.toFlatMap()).isEqualTo(mapOf(
@@ -60,8 +65,8 @@ class SubSettingsTest {
 
     @Test
     fun absentSingleValueSubSetting() {
-        val sub = settings.subSettings("dataSource.second.something")
-        assertThat(sub.absolutePrefix).isEqualTo("dataSource.second.something")
+        val sub = settings.subSettings("dataSource.second.something") as SubSettings
+        assertThat(sub.makeAbsoluteKey("")).isEqualTo("dataSource.second.something")
 
         assertThat(sub.toFlatMap()).isEqualTo(mapOf<String, Any>())
         assertThat(sub.getIfPresent<Int>("")).isNull()
@@ -76,11 +81,11 @@ class SubSettingsTest {
 
     @Test
     fun multilevel() {
-        val dataSource = settings.subSettings("dataSource")
-        assertThat(dataSource.absolutePrefix).isEqualTo("dataSource")
+        val dataSource = settings.subSettings("dataSource") as SubSettings
+        assertThat(dataSource.makeAbsoluteKey("first.url")).isEqualTo("dataSource.first.url")
 
-        val first = dataSource.subSettings("first")
-        assertThat(first.absolutePrefix).isEqualTo("dataSource.first")
+        val first = dataSource.subSettings("first") as SubSettings
+        assertThat(first.makeAbsoluteKey("url")).isEqualTo("dataSource.first.url")
         assertThat(first.contains("username")).isTrue()
         assertThat(first.get<String>("password")).isEqualTo("firstPassword")
         assertThat(first.toFlatMap()).isEqualTo(mapOf(
