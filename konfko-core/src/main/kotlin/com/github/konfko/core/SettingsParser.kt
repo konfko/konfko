@@ -35,10 +35,21 @@ interface ExtensionSettingsParserFactory {
  */
 object PropertySettingsParser : SettingsParser {
     override fun parse(resource: SettingsResource): Settings {
-        val map = resource.openReader()
-                .use { reader -> Properties().apply { load(reader) } }
-
+        val linkedProperties = resource.openReader()
+                .use { reader -> LinkedProperties().apply { load(reader) } }
+        val map = LinkedHashMap<String, Any>()
+        linkedProperties.sortedKeys.forEach { key -> map.put(key, linkedProperties[key]!!) }
         return StructuredSettings(map)
+    }
+
+    // requires a special class because original properties do not preserve key order
+    private class LinkedProperties : Properties() {
+        val sortedKeys = LinkedHashSet<String>()
+
+        override fun put(key: Any, value: Any): Any? {
+            sortedKeys.add(key as String)
+            return super.put(key, value)
+        }
     }
 }
 
