@@ -8,7 +8,7 @@ import com.github.konfko.core.*
 import com.github.konfko.core.derived.prefixBy
 import com.github.konfko.core.derived.subSettings
 import com.github.konfko.core.source.SettingsMaker
-import com.github.konfko.core.watcher.NioConfigurationChangeWatcher
+import com.github.konfko.core.watcher.ScheduledConfigurationChangeWatcher
 import java.net.URI
 import java.time.Duration
 import java.time.LocalTime
@@ -24,10 +24,10 @@ fun main(args: Array<String>) {
     val scheduler = Executors.newScheduledThreadPool(1) // just to periodically print current configuration
 
     withTempDir { dir ->
-        val conf = dir.resolve("sample.settings")
+        val conf = dir.resolve("sample.properties")
         conf.write(confProperties)
 
-        val watcher = NioConfigurationChangeWatcher()
+        val watcher = ScheduledConfigurationChangeWatcher(watchPeriod = Duration.ofSeconds(1))
 
         val reloadableSettings = SettingsMaker().makeAndWatch(watcher) {
             path(conf)

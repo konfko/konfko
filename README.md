@@ -97,3 +97,35 @@ val settings = SettingsMaker().make {
 
 val conf: ServerConf = settings["server"]
 ```
+
+# Watch for changes
+To watch configuration for changes, you need to register a change watcher when creating settings.
+```kotlin
+val watcher = ScheduledConfigurationChangeWatcher(watchPeriod = Duration.ofSeconds(1))
+
+val reloadable = SettingsMaker().makeAndWatch(watcher) {
+    path("config.properties")
+}
+// Start watching configuration for changes.
+watcher.start() 
+
+// immutable snapshot of current settings.
+val settings = reloadable.current
+
+// returns the value of "server.hostname" at the time reloadable.current was called
+val hostname: String = settings["server.hostname"]
+// returns a mutable reference to this setting. hostnameSetting.value will change 
+// whenever underlying configuration changes
+val hostnameSetting: Setting<String> = settings.at("server.hostname")
+// handle to an optional setting
+val timeoutSetting: Setting<Duration?> = settings.at("server.connectionTimeout").optional
+// Setting also acts as a delegate:
+// val hostnameDelegate: String by settings.at("server.hostname")
+// can also register change listeners, but reference to Setting must still be kept
+val hostameListener: Setting<URL> = settings.at("servet.hostname")
+        .onUpdate { println("hostname changed to $it") }
+```
+# Usage examples
+There are several samples showing various features in the test sources of each package:
+* konfko-core: konfko-core/src/test/kotlin/com/github/konfko/core/sample
+* konfko-jackson: konfko-jackson/src/test/kotlin/com/github/konfko/jackson/sample
