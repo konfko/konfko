@@ -38,13 +38,10 @@ private fun subSettingsSample() {
             "username" to "firstUser",
             "password" to "firstPassword"))
     // must exactly match segment prefix
-    assert((root.subSettings("dataSource.fir").toFlatMap() == emptyMap<String, Any>()))
+    assert((root.subSettings("dataSource.fir").toFlatMap().isEmpty()))
     // can be nested
     assert(root.subSettings("dataSource.first") == root.subSettings("dataSource").subSettings("first"))
-    // subSettings can also be expressed as "/"
-    assert(root / "dataSource.first" == root / "dataSource" / "first")
 }
 
 infix fun Settings.subSettings(prefix: String): Settings = SubSettings(this, prefix)
-infix operator fun Settings.div(prefix: String): Settings = SubSettings(this, prefix)
 

@@ -66,10 +66,10 @@ val settings = SettingsMaker().make {
     // highest priority sources are defined first
     path(Paths.get("config.properties"))
     // Loading will not fail if an optional source fails to load (A warning is written to log, but a custom handler is possible)
-    path("plugins.properties") optional true
+    path("plugins.properties").optional()
     systemProperties()
     // settings from a single source can be transformed before they are merged with others
-    environment() transform { it.prefixBy("env") }
+    environment().transform { it.prefixBy("env") }
     classpath("default-config.properties")
     // you can also provide values programatically
     provided(name = "provided", settings = mapOf("env.user.home" to "."))
@@ -126,6 +126,6 @@ val hostameListener: Setting<URL> = settings.at("servet.hostname")
         .onUpdate { println("hostname changed to $it") }
 ```
 # Usage examples
-There are several samples showing various features in the test sources of each package:
+There are several samples showing various features in the test sources of each module:
 * konfko-core: konfko-core/src/test/kotlin/com/github/konfko/core/sample
 * konfko-jackson: konfko-jackson/src/test/kotlin/com/github/konfko/jackson/sample

@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
         // No need to specify it here, either for file parsing or for type conversion
         val reloadableSettings = SettingsMaker().makeAndWatch(watcher) {
             path(conf)
-            systemProperties() transform { it.prefixBy("system") } // prefix all system settings with "system"
+            systemProperties().transform { it.prefixBy("system") } // prefix all system settings with "system"
         }
         // once obtained, settings will never change. For an updated version, you must call ReloadableSettings.current again
         val settings = reloadableSettings.current

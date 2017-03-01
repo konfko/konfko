@@ -54,21 +54,11 @@ class SettingsMaker(
     private fun load(sources: List<SettingsSource>): Settings {
         if (sources.isEmpty()) throw SettingsException("No settings sources were provided")
 
-        val allSettings = sources.map { source -> loadSource(source) }
+        val allSettings = sources.map(SettingsSource::load)
 
 
         val mergedMap = mergeNestedMaps(allSettings.map { it.toNestedMap() })
         return StructuredSettings(mergedMap, typeConverter)
-    }
-
-    private fun loadSource(source: SettingsSource): Settings {
-        return try {
-            source.load()
-        } catch(e: Exception) {
-            if (source is MakingSettingsSource && source.optional) {
-                return source.failureHandler(LoadSettingsFailure(source, e))
-            } else throw e
-        }
     }
 
     private fun makeSources(init: SettingsMakerContext.() -> Unit): List<SettingsSource> {
@@ -85,56 +75,75 @@ private fun settingsMakerSample(): Settings {
         path(Paths.get("config.settings"))
         // Loading will not fail if an optional source fails to load (A warning is written to log instead)
         // Also, can just specify a string for a path
-        path("actor-config.settings") optional true
+        path("actor-config.settings").optional()
         systemProperties()
         // all settings from a single source can be transformed before being merged with others
-        environment() transform { it.prefixBy("env") }
-        classpath("default-config.settings")
-        provided(name = "hardcoded", settings = mapOf("user.home" to ".")) transform { it.prefixBy("env") }
+        environment().transform { it.prefixBy("env") }
+        classpath("default-system-config.settings")
+                .optional()
+                .transform { it.prefixBy("system") }
+        provided(name = "hardcoded", settings = mapOf("user.home" to ".")).transform { it.prefixBy("env") }
     }
     return settings
 }
 
 class LoadSettingsFailure(val source: SettingsSource, val error: Exception)
 
+
 class MakingSettingsSource internal constructor(private val delegate: SettingsSource) : SettingsSource by delegate {
-    val LOG: Logger = LoggerFactory.getLogger(javaClass)
 
     internal val transformers = mutableListOf<(Settings) -> Settings>()
 
-    internal var optional = false
-    internal var failureHandler: (LoadSettingsFailure) -> Settings = { defaultFailureHandler(it) }
+    private var optional = false
+    internal var failureHandler: (LoadSettingsFailure) -> Settings = DEFAULT_FAILURE_HANDLER
 
-    internal fun defaultFailureHandler(failure: LoadSettingsFailure): Settings {
-        val className = failure.source.javaClass.simpleName
-        val sourceName = failure.source.name
-        val errorMessage = failure.error.javaClass.name + ": " + failure.error.message
-        val logMessage = "Could not load settings of type [$className] with name [$sourceName]: $errorMessage." +
-                " As the setting source is marked optional, loading will continue, with these settings treated as empty"
-        val error = if (LOG.isDebugEnabled) failure.error else null
-        LOG.warn(logMessage, error)
-        return emptySettings()
-    }
+
 
     override fun load(): Settings {
-        val delegated = delegate.load()
+        val delegated: Settings = try {
+            delegate.load()
+        } catch(e: Exception) {
+            if (optional) failureHandler.invoke(LoadSettingsFailure(delegate, e))
+            else throw e
+        }
         val transformed = transformers.fold(delegated, { delegated, transformer -> transformer(delegated) })
         return transformed
     }
 
 
-    infix fun optional(optional: Boolean) {
-        this.optional=optional
+    fun optional(optional: Boolean = true): MakingSettingsSource {
+        this.optional = optional
+        return this
     }
 
-    infix fun optional(failureHandler: (LoadSettingsFailure) -> Settings) {
+    fun optional(failureHandler: (LoadSettingsFailure) -> Settings): MakingSettingsSource {
         this.optional = true
         this.failureHandler = failureHandler
+        return this
     }
 
-    infix fun transform(transformer: (Settings) -> Settings) {
+    fun transform(transformer: (Settings) -> Settings): MakingSettingsSource {
         this.transformers.add(transformer)
+        return this
     }
+
+    companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(MakingSettingsSource::class.java)
+
+        private val DEFAULT_FAILURE_HANDLER: (LoadSettingsFailure) -> Settings = { defaultFailureHandler(it) }
+
+        internal fun defaultFailureHandler(failure: LoadSettingsFailure): Settings {
+            val className = failure.source.javaClass.simpleName
+            val sourceName = failure.source.name
+            val errorMessage = failure.error.javaClass.name + ": " + failure.error.message
+            val logMessage = "Could not load settings of type [$className] with name [$sourceName]: $errorMessage." +
+                    " As the setting source is marked optional, loading will continue, with these settings treated as empty"
+            val error = if (LOG.isDebugEnabled) failure.error else null
+            LOG.warn(logMessage, error)
+            return emptySettings()
+        }
+    }
+
 
 }
 
@@ -143,6 +152,7 @@ class MakingSettingsSource internal constructor(private val delegate: SettingsSo
  * to make providing other types of sources a bit easier
  */
 class SettingsMakerContext internal constructor(private val parser: SettingsParser = DefaultSettingsParser) {
+
     internal val sources: MutableList<MakingSettingsSource> = mutableListOf()
 
     fun path(path: String) = add(PathResource(Paths.get(path)))

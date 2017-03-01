@@ -36,7 +36,7 @@ private fun overrideWithSystemPropertiesUnderPrefix() {
     System.setProperty("dataSource.first.username", "ignoredUsername")
     System.setProperty("konfko.dataSource.first.password", "overridePassword")
     val settings = SettingsMaker().make {
-        systemProperties() transform { it.subSettings("konfko") }
+        systemProperties().transform { it.subSettings("konfko") }
         classpath("com/github/konfko/core/dataSources.properties")
     }
 

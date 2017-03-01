@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
 
         val reloadableSettings = SettingsMaker().makeAndWatch(watcher) {
             path(conf)
-            systemProperties() transform { it.prefixBy("system") } // prefix all system settings with "system"
+            systemProperties().transform { it.prefixBy("system") } // prefix all system settings with "system"
         }
         // once obtained, settings will never change. For a new version, you must call ReloadableSettings.current again
         val settings = reloadableSettings.current

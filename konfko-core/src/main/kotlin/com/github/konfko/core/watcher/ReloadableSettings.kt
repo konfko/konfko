@@ -80,7 +80,7 @@ class ReloadableSettings internal constructor(
             listeners.entries
                     .filter {
                         shouldBeNotified(it.value, sortedUpdates).apply {
-                            LOG.info("Should listener ${it.value} be notified: $this")
+                            LOG.info("Should listener ${it.value?:"[root]"} be notified: $this")
                         }
                     }
         }
