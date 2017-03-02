@@ -8,7 +8,7 @@ Reloadable configuration in kotlin
 * optionally can also convert to any type supported by jackson-module-kotlin, including custom data classes
 * extensible: each list above can be extended without any changes to konfko code and often even to the client application. Added features should play nicely with both core and other added features
 * Wherever possible, tries to preserve original order of settings. 
-* Can load from several sources. where additional sources only provides settings missing in the previous sources
+* Can load from several sources, where additional sources only provides settings missing in the previous sources
     * can be used to define default or override sources
     * a source can be defined optional, or be transformed immediately after load (before merging with other sources) 
 * Supports a nested structure of settings
@@ -57,7 +57,7 @@ val settings = SettingsMaker().make {
 
 val hostname: String = settings["server.hostname"]
 val port: Int = settings["server.port"]
-val connectionTimeout: Duration = settings.getIfPresent("server.connectionTimeout") ?: Duration.ofSeconds(30)
+val connectionTimeout: Duration = settings.find("server.connectionTimeout") ?: Duration.ofSeconds(30)
 ```
 
 More complex creation:
@@ -116,13 +116,13 @@ val settings = reloadable.current
 val hostname: String = settings["server.hostname"]
 // returns a mutable reference to this setting. hostnameSetting.value will change 
 // whenever underlying configuration changes
-val hostnameSetting: Setting<String> = settings.at("server.hostname")
+val hostnameSetting: Setting<String> = settings.bind("server.hostname")
 // handle to an optional setting
-val timeoutSetting: Setting<Duration?> = settings.at("server.connectionTimeout").optional
+val timeoutSetting: Setting<Duration?> = settings.bind("server.connectionTimeout").optional
 // Setting also acts as a delegate:
-// val hostnameDelegate: String by settings.at("server.hostname")
+// val hostnameDelegate: String by settings.bind("server.hostname")
 // can also register change listeners, but reference to Setting must still be kept
-val hostameListener: Setting<URL> = settings.at("servet.hostname")
+val listeningHostnameSetting: Setting<URL> = settings.bind("server.hostname")
         .onUpdate { println("hostname changed to $it") }
 ```
 # Usage examples

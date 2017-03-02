@@ -1,6 +1,5 @@
 package com.github.konfko.core.derived
 
-import com.github.konfko.core.getIfPresent
 import com.github.konfko.core.structured.StructuredSettings
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -28,8 +27,8 @@ class PrefixedSettingsTest {
                 "dataSource.second.connectionTimeout" to "20"
         ))
 
-        assertThat(settings.getIfPresent<String>("badDataSource.first.url")).isNull()
-        assertThat(settings.getIfPresent<String>("dataSource.missing.url")).isNull()
+        assertThat(settings.find<String>("badDataSource.first.url")).isNull()
+        assertThat(settings.find<String>("dataSource.missing.url")).isNull()
     }
 
     @Test
@@ -43,7 +42,7 @@ class PrefixedSettingsTest {
                 "system.external.dataSource.second.connectionTimeout" to "20"
         ))
 
-        assertThat(settings.getIfPresent<String>("badPrefix.external.dataSource.first.url")).isNull()
+        assertThat(settings.find<String>("badPrefix.external.dataSource.first.url")).isNull()
     }
 
     companion object {

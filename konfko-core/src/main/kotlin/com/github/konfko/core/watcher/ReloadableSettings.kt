@@ -20,7 +20,7 @@ class ReloadableSettings internal constructor(
     // Should only be accessed through current (except in constructor)
     // first is current static settings, second is a delegate that delegate most calls to first,
     // except creation of Setting, which it delegates to this ReloadableSettings
-    @Volatile private var snapshot: Pair<Settings, ReloadableSettingSettings>
+    @Volatile private var snapshot: Pair<Settings, ReloadableSettingsSnapshot>
 
     var current: Settings
         get() = snapshot.second
@@ -42,7 +42,7 @@ class ReloadableSettings internal constructor(
         watcher.register(this)
     }
 
-    private fun createSnapshot(new: Settings) = Pair(new, ReloadableSettingSettings(new, this))
+    private fun createSnapshot(new: Settings) = Pair(new, ReloadableSettingsSnapshot(new, this))
 
     fun triggerReload() {
         val old = current
@@ -106,8 +106,8 @@ class ReloadableSettings internal constructor(
 
 // delegates all retrievals to static settings (such as MapSettings), except setting function,
 // which is delegated to reloadable settings
-private class ReloadableSettingSettings(val static: Settings, val reloadable: ReloadableSettings) : Settings(), SettingsBase by static {
-    override fun <T : Any> atTyped(key: String, type: Class<T>): Setting<T> = reloadable.typedSetting(key, type)
+private class ReloadableSettingsSnapshot(val static: Settings, val reloadable: ReloadableSettings) : Settings(), SettingsBase by static {
+    override fun <T : Any> bind(key: String, type: Class<T>): Setting<T> = reloadable.typedSetting(key, type)
 }
 
 // visible for testing
@@ -151,7 +151,7 @@ private class ReloadableSetting<T : Any>(settings: ReloadableSettings, val key: 
         updateListener = settings.registerWeakListener(key, { update(it) })
 
         currentValue = try {
-            Pair(settings.current.getTypedIfPresent(key, type), null)
+            Pair(settings.current.find(key, type), null)
         } catch(e: SettingsException) {
             Pair(null, e)
         }
@@ -162,7 +162,7 @@ private class ReloadableSetting<T : Any>(settings: ReloadableSettings, val key: 
         val newValue = when {
         // to support Setting<Settings> we cast it directly
             type.isAssignableFrom(s.javaClass) -> type.cast(s)
-            else -> s.getTypedIfPresent("", type)
+            else -> s.find("", type)
         }
         currentValue = Pair(newValue, null)
         notifyListeners(SettingUpdate(old = oldValue, new = newValue))

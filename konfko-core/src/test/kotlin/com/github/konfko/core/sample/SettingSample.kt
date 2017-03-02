@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
 
 
         // listens to changes to java version (if removed from samples.settings it will revert to system settings)
-        val javaVersion = settings.at<String>("system.java.version").onUpdate { log("Java version changed to $it") }
+        val javaVersion = settings.bind<String>("system.java.version").onUpdate { log("Java version changed to $it") }
 
         // directly retrieve values from settings
         retrieveSettingDirectly(settings)
@@ -81,10 +81,10 @@ private fun createConfigurableService(settings: Settings): ConfigurableService {
     val httpClientSettings = settings.subSettings("httpClient") // alternative: settings / "httpClient"
     val service = ConfigurableService(
             // can refer to full path from root settings
-            settings.at("httpClient.url"),
+            settings.bind("httpClient.url"),
             // can also use a subSettings view, identical to settings.at("httpClient.connectionTimeout")
-            httpClientSettings.at("connectionTimeout"),
-            httpClientSettings.at("keyStore"))
+            httpClientSettings.bind("connectionTimeout"),
+            httpClientSettings.bind("keyStore"))
     return service
 }
 

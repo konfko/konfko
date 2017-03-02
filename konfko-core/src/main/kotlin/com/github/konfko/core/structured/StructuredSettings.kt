@@ -20,7 +20,7 @@ import com.github.konfko.core.*
  */
 class StructuredSettings(data: Any,
                          private val typeConverter: SettingsTypeConverter = DefaultSettingsTypeConverter) :
-        AbstractSettings() {
+        ValuedSettings() {
 
     private val nestedProperties: Map<String, Any> = mapifyNested(flatToNested(data))
 
@@ -28,15 +28,15 @@ class StructuredSettings(data: Any,
     override fun toFlatMap(): Map<String, Any> = nestedToFlat(nestedProperties)
     override fun contains(key: String): Boolean = findNested(nestedProperties, key) != null
 
-    override fun <T : Any> getTypedIfPresent(key: String, type: Class<T>): T? =
+    override fun <T : Any> find(key: String, type: Class<T>): T? =
             findNested(nestedProperties, key)
                     ?.let { value -> typeConverter.convertTo(value, type) }
 
     override fun toNestedMap(): Map<String, Any> = nestedProperties
 
-    override fun <T : Any> atTyped(key: String, type: Class<T>): Setting<T> =
+    override fun <T : Any> bind(key: String, type: Class<T>): Setting<T> =
             try {
-                ConstantSetting(getTypedIfPresent(key, type))
+                ConstantSetting(find(key, type))
             } catch (e: SettingsException) {
                 ConstantSetting(null, conversionError = e)
             }

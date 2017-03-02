@@ -42,7 +42,11 @@ interface SettingsSource {
 /**
  * A [SettingsSource] that is backed by a backing resource
  */
-class ResourceSettingsSource(override val backingResource: SettingsResource, private val parser: SettingsParser) : SettingsSource {
+class ResourceSettingsSource(
+        override val backingResource: SettingsResource,
+        private val parser: SettingsParser)
+    : SettingsSource {
+
     override val name = backingResource.name
     override val lastModified: Instant? get() = backingResource.lastModified
 
@@ -54,7 +58,11 @@ class ResourceSettingsSource(override val backingResource: SettingsResource, pri
  *
  * Supports updates by setting the [settings] property to a new map
  */
-class StructuredSettingsSource(override val name: String, settings: Any) : SettingsSource {
+class StructuredSettingsSource(
+        override val name: String,
+        settings: Any)
+    : SettingsSource {
+
     override var lastModified: Instant = Instant.now()
         private set
 
@@ -93,9 +101,9 @@ private object EnvironmentPropertiesSource : SettingsSource {
 /**
  * Returns all system settings
  */
-fun systemPropertiesSource(): SettingsSource = SystemPropertiesSource
+internal fun systemPropertiesSource(): SettingsSource = SystemPropertiesSource
 
 /**
  * Returns all environment settings, changing key format from SNAKE_CASE to period.case
  */
-fun environmentPropertiesSource(): SettingsSource = EnvironmentPropertiesSource
+internal fun environmentPropertiesSource(): SettingsSource = EnvironmentPropertiesSource

@@ -3,7 +3,6 @@
 package com.github.konfko.core.sample
 
 import com.github.konfko.core.derived.subSettings
-import com.github.konfko.core.getIfPresent
 import com.github.konfko.core.source.SettingsMaker
 
 /**
@@ -26,8 +25,8 @@ fun main(args: Array<String>) {
     println("First url: $firstUrl, second url: $secondUrl")
 
     // optional Int settings
-    val firstConnectionTimeout: Int? = firstDataSource.getIfPresent("connectionTimeout")
-    val secondConnectionTimeout: Int? = secondDataSource.getIfPresent("connectionTimeout")
+    val firstConnectionTimeout: Int? = firstDataSource.find("connectionTimeout")
+    val secondConnectionTimeout: Int? = secondDataSource.find("connectionTimeout")
     println("First timeout: $firstConnectionTimeout, second timeout: $secondConnectionTimeout")
 
     println("All data sources: ${settings.subSettings("dataSource").topLevelKeys}")

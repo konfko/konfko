@@ -1,9 +1,9 @@
 package com.github.konfko.core.derived
 
-import com.github.konfko.core.AbstractSettings
 import com.github.konfko.core.NoSuchSettingException
 import com.github.konfko.core.Setting
 import com.github.konfko.core.Settings
+import com.github.konfko.core.ValuedSettings
 import com.github.konfko.core.structured.findNested
 import com.github.konfko.core.structured.mapifyNested
 import com.github.konfko.core.structured.nestedToFlat
@@ -15,7 +15,7 @@ import java.util.*
 /**
  * An abstract class for settings that have been derived from other settings.
  */
-abstract class DerivedSettings : AbstractSettings() {
+abstract class DerivedSettings : ValuedSettings() {
     /**
      * Root settings in the derived chain
      */
@@ -45,14 +45,14 @@ abstract class DerivedSettings : AbstractSettings() {
 
     abstract protected fun makeParentKey(key: String): String
 
-    override fun <T : Any> getTyped(key: String, type: Class<T>): T =
-            getTypedIfPresent(key, type) ?: throw NoSuchSettingException(makeAbsoluteKey(key))
+    override fun <T : Any> get(key: String, type: Class<T>): T =
+            find(key, type) ?: throw NoSuchSettingException(makeAbsoluteKey(key))
 
-    override fun <T : Any> getTypedIfPresent(key: String, type: Class<T>): T? =
-            parent.getTypedIfPresent(makeParentKey(key), type)
+    override fun <T : Any> find(key: String, type: Class<T>): T? =
+            parent.find(makeParentKey(key), type)
 
-    override fun <T : Any> atTyped(key: String, type: Class<T>): Setting<T> {
-        return parent.atTyped(makeParentKey(key), type)
+    override fun <T : Any> bind(key: String, type: Class<T>): Setting<T> {
+        return parent.bind(makeParentKey(key), type)
     }
 
 

@@ -1,7 +1,6 @@
 package com.github.konfko.core.structured
 
 import com.github.konfko.core.NoSuchSettingException
-import com.github.konfko.core.getIfPresent
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.Test
@@ -43,8 +42,8 @@ class StructuredSettingsTest {
 
     @Test
     fun getIfPresent() {
-        assertThat(settings.getIfPresent<String>("dataSource.first.password")).isEqualTo("firstPassword")
-        assertThat(settings.getIfPresent<String>("dataSource.something.password")).isNull()
+        assertThat(settings.find<String>("dataSource.first.password")).isEqualTo("firstPassword")
+        assertThat(settings.find<String>("dataSource.something.password")).isNull()
     }
 
 

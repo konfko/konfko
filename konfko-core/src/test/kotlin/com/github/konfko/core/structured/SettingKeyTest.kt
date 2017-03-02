@@ -1,6 +1,5 @@
 package com.github.konfko.core.structured
 
-import com.github.konfko.core.structured.SettingKey
 import org.assertj.core.api.AbstractIterableAssert
 import org.assertj.core.api.AbstractObjectAssert
 import org.assertj.core.api.Assertions
@@ -74,16 +73,6 @@ class SettingKeyTest {
     }
 }
 
-fun <A> A.assert(): AbstractObjectAssert<*, A> = Assertions.assertThat(this)
-
 fun <A : Iterable<T>, T> A.assert(): AbstractIterableAssert<*, *, T> {
     return Assertions.assertThat(this)
 }
-
-//class PubListAssert<T>(actual: List<T>) : ListAssert<T>(actual) //fun <S, A, T> ListAssert<S, A, T>.map(mapper: (T) -> S): ListAssert<A> {
-//    val es = arrayOf(Extractor<T, S> { it -> mapper(it) })
-//    val tuples = extracting(*es)
-//    return ListAssert<Tuple>(this.map {  })
-//
-//
-//}

@@ -66,7 +66,7 @@ fun main(args: Array<String>) {
 private fun createConfigurableService(settings: Settings): ConfigurableService {
     val service = ConfigurableService(
             // Use jackson parser to convert to settings classes
-            settings.at("httpClient")
+            settings.bind("httpClient")
     )
     return service
 }

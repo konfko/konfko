@@ -1,7 +1,6 @@
 package com.github.konfko.core.derived
 
 import com.github.konfko.core.NoSuchSettingException
-import com.github.konfko.core.getIfPresent
 import com.github.konfko.core.structured.StructuredSettings
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -66,7 +65,7 @@ class SubSettingsTest {
         assertThat(sub.makeAbsoluteKey("")).isEqualTo("dataSource.second.something")
 
         assertThat(sub.toFlatMap()).isEqualTo(mapOf<String, Any>())
-        assertThat(sub.getIfPresent<Int>("")).isNull()
+        assertThat(sub.find<Int>("")).isNull()
         assertThat(sub.empty).isTrue()
         try {
             sub.get<String>("")

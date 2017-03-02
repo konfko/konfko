@@ -28,24 +28,18 @@ interface SettingsBase {
     /**
      * Get the setting value at [key] and converts it to [type]. If there is no such key, it returns null.
      *
-     * This function has a slightly weird name to avoid clashing with the wrapping extension function [getIfPresent],
-     * which is the one you should normally use.
-     *
      *  @throws SettingTypeConversionException if the value could not be converted to this type
      */
-    fun <T : Any> getTypedIfPresent(key: String, type: Class<T>): T?
+    fun <T : Any> find(key: String, type: Class<T>): T?
+
 
     /**
      * Get the setting value at [key] and converts it to [type].
      *
-     * This function has a slightly weird name to avoid clashing with the wrapping extension function [get],
-     * which is the one you should normally use.
-     *
      *  @throws NoSuchSettingException if there is no setting under this key
      *  @throws SettingTypeConversionException if the value could not be converted to type [T]
      */
-    fun <T : Any> getTyped(key: String, type: Class<T>): T
-
+    fun <T : Any> get(key: String, type: Class<T>): T
 
 
     /**
@@ -62,11 +56,8 @@ interface SettingsBase {
      * Get the [Setting] handler of type [T] at [key]. This always returns successfully, even if the value does not
      * exist or cannot be converted to the proper type. Any such errors are delayed until first invocation of
      * the relevant Setting property.
-     *
-     * This function has a slightly weird name to avoid clashing with the wrapping extension function [at],
-     * which is the one you should normally use.
      */
-    fun <T : Any> atTyped(key: String, type: Class<T>): Setting<T>
+    fun <T : Any> bind(key: String, type: Class<T>): Setting<T>
 
 }
 
@@ -75,49 +66,50 @@ interface SettingsBase {
  * It provides a nested view of setting settings. In keys, levels are specified with '.'
  *
  * Implementations of this interface are always immutable, event for reloadable settings.
- * You can however get a potentially reloadable view of a particular setting with [atTyped], or more
- * comfortably with the extension function [at]
+ * You can however get a potentially reloadable view of a particular setting with [bind].
  *
  * To get an reloaded version of Settings, you need to call [ReloadableSettings.snapshot]
  *
  * This is an abstract class instead of an interface in order to support inline method, needed for reified types.
  */
-abstract class Settings: SettingsBase {
+abstract class Settings : SettingsBase {
+
+    /**
+     * Get the setting value at [key] and converts it to type [T]. If there is no such key, it returns null.
+     *
+     * This function is a type reified wrapper around [Settings.find]
+     *
+     * @throws SettingTypeConversionException if the value could not be converted to this type
+     *
+     * @see [SettingsBase.find]
+     */
+    inline fun <reified T : Any> find(key: String): T? = find(key, T::class.java)
+
     /**
      * Get the setting value at [key] and converts it to type [T].
      *
+     * @throws NoSuchSettingException if there is no setting under this key
+     * @throws SettingTypeConversionException if the value could not be converted to type [T]
      *
-     *  @throws NoSuchSettingException if there is no setting under this key
-     *  @throws SettingTypeConversionException if the value could not be converted to type [T]
+     * @see [SettingsBase.get]
      */
-    inline operator fun <reified T : Any> get(key: String): T = getTyped(key, T::class.java)
+    inline operator fun <reified T : Any> get(key: String): T = get(key, T::class.java)
 
 
     /**
      * Get the [Setting] handler of type [T] at [key]. This always returns successfully, even if the value does not
      * exist or cannot be converted to the proper type. Any such errors are delayed until first invocation of
      * the relevant Setting property.
-     *
-     * If the underlying settings are reloadable, this provides a mutable view of the most recent value that was
-     * successfully converted to type [T]
+
+     * @see [SettingsBase.bind]
      */
-    inline infix fun <reified T : Any> at(key: String): Setting<T> = atTyped(key, T::class.java)
+    inline infix fun <reified T : Any> bind(key: String): Setting<T> = bind(key, T::class.java)
 }
 
 
-/**
- * Get the setting value at [key] and converts it to type [T]. If there is no such key, it returns null.
- *
- * This function is a type reified wrapper around [Settings.getTypedIfPresent]
- *
- *  @throws SettingTypeConversionException if the value could not be converted to this type
- */
-inline fun <reified T : Any> Settings.getIfPresent(key: String): T? = getTypedIfPresent(key, T::class.java)
-
-
-abstract class AbstractSettings : Settings() {
+abstract class ValuedSettings : Settings() {
     override val topLevelKeys: Set<String> get() = toNestedMap().keys
-    override fun <T : Any> getTyped(key: String, type: Class<T>): T = getTypedIfPresent(key, type) ?: throw NoSuchSettingException(key.toString())
+    override fun <T : Any> get(key: String, type: Class<T>): T = find(key, type) ?: throw NoSuchSettingException(key.toString())
 
     override fun hashCode(): Int {
         return toFlatMap().hashCode()
@@ -129,18 +121,18 @@ abstract class AbstractSettings : Settings() {
 }
 
 
-private object EmptySettings : AbstractSettings() {
+private object EmptySettings : ValuedSettings() {
     override val empty = true
 
     override fun contains(key: String): Boolean = false
 
-    override fun <T : Any> getTypedIfPresent(key: String, type: Class<T>): T? = null
+    override fun <T : Any> find(key: String, type: Class<T>): T? = null
 
     override fun toFlatMap(): Map<String, Any> = emptyMap()
 
     override fun toNestedMap(): Map<String, Any> = emptyMap()
 
-    override fun <T : Any> atTyped(key: String, type: Class<T>): Setting<T> = ConstantSetting(null)
+    override fun <T : Any> bind(key: String, type: Class<T>): Setting<T> = ConstantSetting(null)
 }
 
 

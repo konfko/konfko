@@ -88,7 +88,7 @@ dataSource.first.username=firstUser_Updated
             if (this == null) {
                 throw AssertionError("Setting change was not triggered")
             }
-            val actual = getTypedIfPresent(key, Any::class.java)
+            val actual = find(key, Any::class.java)
             assertThat(actual).withFailMessage("setting key [$key] should not be present, but actual: [$actual]").isNull()
         }
 
@@ -97,7 +97,7 @@ dataSource.first.username=firstUser_Updated
                 throw AssertionError("Setting change was not triggered")
             }
 
-            val actual = getTypedIfPresent(key, T::class.java)
+            val actual = find(key, T::class.java)
             assertThat(actual).withFailMessage("setting [$key] should have value [$expected], but found: [$actual]").isEqualTo(expected)
         }
     }
