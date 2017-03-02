@@ -1,6 +1,5 @@
 package com.github.konfko.core.source
 
-import com.github.konfko.core.get
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 

@@ -1,6 +1,5 @@
 package com.github.konfko.core.derived
 
-import com.github.konfko.core.get
 import com.github.konfko.core.getIfPresent
 import com.github.konfko.core.structured.StructuredSettings
 import org.assertj.core.api.Assertions.assertThat

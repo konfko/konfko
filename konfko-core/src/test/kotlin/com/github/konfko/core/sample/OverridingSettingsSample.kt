@@ -3,7 +3,6 @@
 package com.github.konfko.core.sample
 
 import com.github.konfko.core.derived.subSettings
-import com.github.konfko.core.get
 import com.github.konfko.core.source.SettingsMaker
 
 /**

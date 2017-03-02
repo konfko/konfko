@@ -1,6 +1,5 @@
 package com.github.konfko.jackson
 
-import com.github.konfko.core.get
 import com.github.konfko.core.source.SettingsMaker
 import org.junit.Test
 

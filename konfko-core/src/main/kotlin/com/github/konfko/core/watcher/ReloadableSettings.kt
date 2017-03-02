@@ -106,7 +106,7 @@ class ReloadableSettings internal constructor(
 
 // delegates all retrievals to static settings (such as MapSettings), except setting function,
 // which is delegated to reloadable settings
-private class ReloadableSettingSettings(val static: Settings, val reloadable: ReloadableSettings) : Settings by static {
+private class ReloadableSettingSettings(val static: Settings, val reloadable: ReloadableSettings) : Settings(), SettingsBase by static {
     override fun <T : Any> atTyped(key: String, type: Class<T>): Setting<T> = reloadable.typedSetting(key, type)
 }
 

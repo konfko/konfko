@@ -2,7 +2,6 @@ package com.github.konfko.jackson.sample
 
 import com.github.konfko.core.Setting
 import com.github.konfko.core.Settings
-import com.github.konfko.core.at
 import com.github.konfko.core.derived.prefixBy
 import com.github.konfko.core.source.SettingsMaker
 import com.github.konfko.core.watcher.NioConfigurationChangeWatcher

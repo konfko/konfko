@@ -1,10 +1,8 @@
 package com.github.konfko.jackson
 
 import com.github.konfko.core.DefaultSettingsParser
-import com.github.konfko.core.get
-import com.github.konfko.core.source.ClassPathResource
-import com.github.konfko.core.source.SettingsMaker
 import com.github.konfko.core.derived.subSettings
+import com.github.konfko.core.source.ClassPathResource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
